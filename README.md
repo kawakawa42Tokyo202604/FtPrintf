@@ -1,42 +1,83 @@
-
 # FtPrintf
 
+## English
 
-## 概要
-`printf` が提供する書式付き出力機能の一部を再実装しました。書式指定文字列を解析し、可変長引数から取得した値を標準出力に出力するライブラリ `libftprintf.a` を作成しました。
+A C implementation of formatted output: inserting numbers and strings into text. For example, `ft_printf("score: %d\n", 42)` replaces `%d` with an integer and prints `score: 42`.
 
-### 処理の流れ
-書式指定文字列を先頭から読み進め、対応する変換指定子に応じて文字列、数値、ポインタ値などを出力します。対応する指定子は以下のとおりです。
+Building creates `libftprintf.a`, a library that exposes `ft_printf` to C programs. The function also returns the number of characters printed.
 
-### 処理方法
-書式指定文字列を1文字ずつ走査します。通常の文字はそのまま出力し、`%` の後に変換指定子が続く場合は、対応する処理に引数を渡します。
+### Supported conversions
 
-### 対応している指定子
-| 指定子 | 内容 |
-| :--- | :--- |
-| `%c` | 文字の出力 |
-| `%s` | 文字列の出力 |
-| `%p` | ポインタ値を16進数で出力 |
-| `%d / %i` | 符号付き10進整数の出力 |
-| `%u` | 符号なし10進整数の出力 |
-| `%x / %X` | 16進整数の出力（小文字 / 大文字） |
-| `%%` | パーセント記号の出力 |
+| Specifier | Output |
+| --- | --- |
+| `%c` | Character |
+| `%s` | String |
+| `%p` | Pointer address in hexadecimal |
+| `%d` / `%i` | Signed decimal integer |
+| `%u` | Unsigned decimal integer |
+| `%x` / `%X` | Hexadecimal integer, lowercase / uppercase |
+| `%%` | A literal `%` |
 
-## 使用方法
+### Build and try
 
-### コンパイル
-付属のMakefileを使ってライブラリを作成します。
-```bash
-make        # libftprintf.a を生成
-make clean  # オブジェクトファイルを削除
-make fclean # 生成したファイルをすべて削除
-make re     # fclean の後に再ビルド
+Requires a C compiler and Make. The supplied [main.c](main.c) demonstrates the library.
+
+```sh
+make
+make run
 ```
 
-## 参考資料
-- `man 3 printf`
-- `man 3 stdarg`
-- `man 2 write`
+`make` builds `libftprintf.a`; `make example` builds the demonstration executable. `make run` prints `answer: 42`.
 
-### AIの利用
-可変長引数の扱いや課題仕様の確認、READMEの構成と文章の見直しにAIを利用しました。
+### Implementation
+
+Uses variable arguments from `stdarg.h` and dispatches output by conversion specifier. It returns the output character count, or `-1` on error.
+
+### Tests
+
+```sh
+make test
+```
+
+Checks every supported conversion, empty strings, NUL characters, integer limits, byte counts, and write errors.
+
+## 日本語
+
+文字列の中に数値や別の文字列を埋め込んで表示する、Cの `printf` 関数を自作したものです。例えば `ft_printf("score: %d\n", 42)` は、`%d` を整数に置き換えて `score: 42` と表示します。
+
+ビルドすると、Cプログラムから `ft_printf` を呼び出せるライブラリファイル `libftprintf.a` ができます。出力内容に加え、表示した文字数も戻り値で受け取れます。
+
+### 対応する変換指定子
+
+| 指定子 | 出力 |
+| --- | --- |
+| `%c` | 文字 |
+| `%s` | 文字列 |
+| `%p` | ポインタ値（16進数） |
+| `%d` / `%i` | 符号付き10進整数 |
+| `%u` | 符号なし10進整数 |
+| `%x` / `%X` | 16進整数（小文字 / 大文字） |
+| `%%` | `%` |
+
+### ビルドと使用例
+
+Cコンパイラ・Make が必要です。付属の [main.c](main.c) でライブラリの使用例を実行できます。
+
+```sh
+make
+make run
+```
+
+`make` は `libftprintf.a`、`make example` はそれを呼び出す実行例をビルドします。`make run` では `answer: 42` を表示します。
+
+### 実装メモ
+
+`stdarg.h` の可変長引数を使い、変換指定子ごとに出力処理を分けています。戻り値は出力した文字数で、エラー時は `-1` です。
+
+### テスト
+
+```sh
+make test
+```
+
+対応する全変換指定子、空文字列、NUL文字、整数境界値、出力バイト数、書き込みエラーを確認します。

@@ -1,3 +1,5 @@
+EXAMPLE = printf_example
+
 NAME    = libftprintf.a
 CC      = cc
 CFLAGS  = -Wall -Wextra -Werror
@@ -16,8 +18,25 @@ clean:
 	rm -f $(OBJS)
 
 fclean: clean
-	rm -f $(NAME)
+	rm -f $(NAME) $(EXAMPLE)
 
 re: fclean all
 
 .PHONY: all clean fclean re
+
+example: $(EXAMPLE)
+
+$(EXAMPLE): main.c $(NAME)
+	$(CC) $(CFLAGS) $(CPPFLAGS) main.c $(NAME) $(LDFLAGS) $(LDLIBS) -o $@
+
+run: $(EXAMPLE)
+	./$(EXAMPLE)
+
+.PHONY: example run
+
+test: $(NAME)
+	@set -eu; test_dir=$$(mktemp -d); trap 'rm -rf "$$test_dir"' EXIT; \
+	$(CC) $(CPPFLAGS) $(CFLAGS) -I. tests/test_printf.c $(NAME) $(LDFLAGS) $(LDLIBS) -o "$$test_dir/test"; \
+	"$$test_dir/test"
+
+.PHONY: test
